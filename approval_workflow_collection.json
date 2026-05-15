@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "Approval Workflow APIs",
+    "description": "Postman collection I used while testing the approval workflow backend APIs during development.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Requests",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Check status code\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response should be array\", function () {",
+              "    const data = pm.response.json();",
+              "    pm.expect(data).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/requests",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["requests"]
+        },
+        "description": "Used to get all requests. Filters can also be added like status or type."
+      },
+      "response": []
+    },
+    {
+      "name": "Add New Request",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Sick Leave\",\n  \"description\": \"Not feeling well today\",\n  \"requestedBy\": \"Sam\",\n  \"type\": \"LEAVE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/requests",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["requests"]
+        },
+        "description": "Creates a new approval request."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Request Status",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"APPROVED\",\n  \"role\": \"MANAGER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/requests/074fb8b8-7acc-4fca-bd7d-60d1bab3e8d7/status",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": [
+            "requests",
+            "074fb8b8-7acc-4fca-bd7d-60d1bab3e8d7",
+            "status"
+          ]
+        },
+        "description": "Approve or reject request using request ID."
+      },
+      "response": []
+    }
+  ]
+}

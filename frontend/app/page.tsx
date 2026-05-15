@@ -11,7 +11,9 @@ import {
   Calendar,
   DollarSign,
   Briefcase,
-  Clock
+  Clock,
+  Check,
+  X
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/requests";
@@ -113,7 +115,7 @@ export default function Dashboard() {
               
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="hidden sm:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+                className="hidden sm:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-shadow shadow-sm"
               >
                 <Plus size={18} />
                 New Request
@@ -126,13 +128,13 @@ export default function Dashboard() {
       {/* Mobile Plus Icon (FAB) */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="sm:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg active:scale-95 transition-transform"
+        className="sm:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg active:scale-95 transition-all"
       >
         <Plus size={24} />
       </button>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
-        {/* Stats Grid - 1 line on mobile */}
+        {/* Stats Grid */}
         <div className="flex flex-row gap-2 sm:gap-6 mb-6">
           <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
             <div className="p-1.5 sm:p-3 bg-blue-50 rounded-lg text-blue-600 mb-1 sm:mb-2">
@@ -171,7 +173,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-2 w-full">
               <select 
                 value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="PENDING">Pending</option>
@@ -180,7 +182,7 @@ export default function Dashboard() {
               </select>
               <select 
                 value={filterType} onChange={(e) => setFilterType(e.target.value)}
-                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="LEAVE">Leave</option>
@@ -191,16 +193,16 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Content - Proper Responsive View */}
+        {/* List Content */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="py-20 flex flex-col items-center justify-center text-gray-400">
               <Loader2 className="animate-spin mb-2" size={32} />
-              <p className="text-[10px] font-black uppercase">Loading...</p>
+              <p className="text-[10px] font-black uppercase">Syncing...</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="py-24 text-center text-gray-300 px-4">
-              <p className="text-xs font-bold uppercase tracking-widest">No Results</p>
+            <div className="py-24 text-center text-gray-300 px-4 font-bold text-xs uppercase tracking-widest">
+              No results found
             </div>
           ) : (
             <>
@@ -209,11 +211,11 @@ export default function Dashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Request</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Requested By</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Request Details</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Requester</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Category</th>
                       <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                      <th className="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+                      <th className="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -225,13 +227,13 @@ export default function Dashboard() {
                         </td>
                         <td className="px-6 py-4 text-sm font-semibold text-gray-700">{req.requestedBy}</td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-1 text-[10px] font-black text-gray-500 uppercase">
+                          <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-500 uppercase">
                             {req.type === 'LEAVE' ? <Calendar size={12} /> : req.type === 'EXPENSE' ? <DollarSign size={12} /> : <Briefcase size={12} />}
                             {req.type}
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2 py-1 text-[10px] font-black uppercase rounded-full border ${
+                          <span className={`px-2.5 py-1 text-[10px] font-black uppercase rounded-full border ${
                             req.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-100' :
                             req.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-100' :
                             'bg-amber-50 text-amber-700 border-amber-100'
@@ -241,9 +243,21 @@ export default function Dashboard() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           {req.status === 'PENDING' && role === 'MANAGER' && (
-                            <div className="flex justify-end gap-3">
-                              <button onClick={() => handleUpdateStatus(req.id, 'APPROVED')} className="text-green-600 text-[10px] font-black uppercase">Approve</button>
-                              <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className="text-red-600 text-[10px] font-black uppercase">Reject</button>
+                            <div className="flex justify-end gap-2">
+                              <button 
+                                onClick={() => handleUpdateStatus(req.id, 'APPROVED')} 
+                                className="w-8 h-8 flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm transition-all active:scale-90"
+                                title="Approve"
+                              >
+                                <Check size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateStatus(req.id, 'REJECTED')} 
+                                className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-sm transition-all active:scale-90"
+                                title="Reject"
+                              >
+                                <X size={18} />
+                              </button>
                             </div>
                           )}
                         </td>
@@ -256,10 +270,10 @@ export default function Dashboard() {
               {/* Mobile View */}
               <div className="md:hidden divide-y divide-gray-100">
                 {requests.map((req) => (
-                  <div key={req.id} className="p-4 active:bg-gray-50">
-                    <div className="flex justify-between items-start mb-1.5">
+                  <div key={req.id} className="p-5 active:bg-gray-50 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold text-gray-900 leading-tight pr-4">{req.title}</h4>
-                      <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded-full border flex-shrink-0 ${
+                      <span className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full border flex-shrink-0 ${
                         req.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-100' :
                         req.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-100' :
                         'bg-amber-50 text-amber-700 border-amber-100'
@@ -267,16 +281,26 @@ export default function Dashboard() {
                         {req.status}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3 line-clamp-2">{req.description}</p>
+                    <p className="text-xs text-gray-500 mb-4 line-clamp-2">{req.description}</p>
                     <div className="flex items-center justify-between">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase">
-                        By <span className="text-gray-700">{req.requestedBy}</span>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                        Request by <span className="text-gray-700 font-black">{req.requestedBy}</span>
                       </div>
-                      <div className="flex gap-4">
+                      <div className="flex gap-3">
                         {req.status === 'PENDING' && role === 'MANAGER' && (
-                          <div className="flex gap-3">
-                            <button onClick={() => handleUpdateStatus(req.id, 'APPROVED')} className="text-green-600 text-[10px] font-black uppercase">Pass</button>
-                            <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className="text-red-600 text-[10px] font-black uppercase">Fail</button>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleUpdateStatus(req.id, 'APPROVED')} 
+                              className="w-9 h-9 flex items-center justify-center bg-green-600 text-white rounded-full shadow-md active:scale-90 transition-all"
+                            >
+                              <Check size={20} />
+                            </button>
+                            <button 
+                              onClick={() => handleUpdateStatus(req.id, 'REJECTED')} 
+                              className="w-9 h-9 flex items-center justify-center bg-red-600 text-white rounded-full shadow-md active:scale-90 transition-all"
+                            >
+                              <X size={20} />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -292,22 +316,22 @@ export default function Dashboard() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
-          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)} />
           <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl shadow-2xl p-8">
-            <h3 className="text-lg font-bold mb-6">New Request</h3>
+            <h3 className="text-lg font-bold mb-6">New Entry</h3>
             <form onSubmit={handleCreateRequest} className="space-y-4">
               <input 
                 type="text" required placeholder="Subject" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
               />
               <input 
                 type="text" required placeholder="Your Name" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.requestedBy} onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
               />
               <select 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
               >
                 <option value="GENERAL">General</option>
@@ -315,8 +339,8 @@ export default function Dashboard() {
                 <option value="EXPENSE">Expense</option>
               </select>
               <textarea 
-                rows={3} required placeholder="Description" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 resize-none"
+                rows={3} required placeholder="Reason / Description" 
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 resize-none focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
               <div className="flex gap-3 pt-2">

@@ -4,8 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { 
   Plus, 
+  CheckCircle2, 
+  XCircle, 
+  Filter, 
   Loader2,
-  Filter
+  Calendar,
+  DollarSign,
+  Briefcase,
+  Clock
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/requests";
@@ -48,7 +54,7 @@ export default function Dashboard() {
       const response = await axios.get(API_URL, { params });
       setRequests(response.data);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error fetching requests:", error);
     } finally {
       setLoading(false);
     }
@@ -66,7 +72,7 @@ export default function Dashboard() {
       setFormData({ title: "", description: "", requestedBy: "", type: "GENERAL" });
       fetchRequests();
     } catch (error) {
-      alert("Failed to create request.");
+      alert("Error creating request.");
     }
   };
 
@@ -75,187 +81,247 @@ export default function Dashboard() {
       await axios.put(`${API_URL}/${id}/status`, { status, role });
       fetchRequests();
     } catch (error: any) {
-      alert(error.response?.data?.message || "Update failed.");
+      alert(error.response?.data?.message || "Action failed.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-white text-black p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8 border-b pb-4">
-          <h1 className="text-2xl font-bold">Approval System</h1>
-          <div className="flex items-center gap-4">
-            <select 
-              value={role} 
-              onChange={(e) => setRole(e.target.value as any)}
-              className="border p-2 rounded text-sm bg-gray-50"
-            >
-              <option value="USER">User Role</option>
-              <option value="MANAGER">Manager Role</option>
-            </select>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700"
-            >
-              Add New Request
-            </button>
+    <div className="min-h-screen bg-gray-50 text-gray-900 pb-20 sm:pb-0">
+      {/* Header */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between sm:h-16 py-3 sm:py-0 gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold tracking-tight">Request Workflow</span>
+            </div>
+            
+            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+              <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
+                <button 
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-md transition-all ${role === 'USER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
+                  onClick={() => setRole('USER')}
+                >
+                  User View
+                </button>
+                <button 
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-md transition-all ${role === 'MANAGER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
+                  onClick={() => setRole('MANAGER')}
+                >
+                  Manager View
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="hidden sm:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+              >
+                <Plus size={18} />
+                New Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Plus Icon (FAB) */}
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="sm:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg active:scale-95 transition-transform"
+      >
+        <Plus size={24} />
+      </button>
+
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
+        {/* Stats Grid - 1 line on mobile */}
+        <div className="flex flex-row gap-2 sm:gap-6 mb-6">
+          <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
+            <div className="p-1.5 sm:p-3 bg-blue-50 rounded-lg text-blue-600 mb-1 sm:mb-2">
+              <Plus size={16} />
+            </div>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Total</p>
+            <p className="text-sm sm:text-2xl font-black">{requests.length}</p>
+          </div>
+          <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
+            <div className="p-1.5 sm:p-3 bg-amber-50 rounded-lg text-amber-600 mb-1 sm:mb-2">
+              <Clock size={16} />
+            </div>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Pending</p>
+            <p className="text-sm sm:text-2xl font-black text-amber-600">
+              {requests.filter(r => r.status === 'PENDING').length}
+            </p>
+          </div>
+          <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
+            <div className="p-1.5 sm:p-3 bg-green-50 rounded-lg text-green-600 mb-1 sm:mb-2">
+              <CheckCircle2 size={16} />
+            </div>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Approved</p>
+            <p className="text-sm sm:text-2xl font-black text-green-600">
+              {requests.filter(r => r.status === 'APPROVED').length}
+            </p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex gap-4 mb-6 items-center bg-gray-50 p-4 rounded border">
-          <div className="flex items-center gap-2">
-            <Filter size={16} />
-            <span className="font-semibold text-sm">Filters:</span>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-center gap-2 text-gray-400">
+              <Filter size={16} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Filter By</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 w-full">
+              <select 
+                value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+              >
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+              <select 
+                value={filterType} onChange={(e) => setFilterType(e.target.value)}
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+              >
+                <option value="">All Types</option>
+                <option value="LEAVE">Leave</option>
+                <option value="EXPENSE">Expense</option>
+                <option value="GENERAL">General</option>
+              </select>
+            </div>
           </div>
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="border p-2 rounded text-sm bg-white"
-          >
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
-          </select>
-          <select 
-            value={filterType} 
-            onChange={(e) => setFilterType(e.target.value)}
-            className="border p-2 rounded text-sm bg-white"
-          >
-            <option value="">All Types</option>
-            <option value="LEAVE">Leave</option>
-            <option value="EXPENSE">Expense</option>
-            <option value="GENERAL">General</option>
-          </select>
         </div>
 
-        {/* Table / List */}
-        <div className="border rounded-lg overflow-hidden">
+        {/* Content - Proper Responsive View */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center text-gray-500">
-              <Loader2 className="animate-spin inline-block mr-2" size={20} />
-              Loading...
+            <div className="py-20 flex flex-col items-center justify-center text-gray-400">
+              <Loader2 className="animate-spin mb-2" size={32} />
+              <p className="text-[10px] font-black uppercase">Loading...</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="p-10 text-center text-gray-500">No requests found.</div>
+            <div className="py-24 text-center text-gray-300 px-4">
+              <p className="text-xs font-bold uppercase tracking-widest">No Results</p>
+            </div>
           ) : (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-100 border-b">
-                  <th className="p-4 font-semibold text-sm">Title / Description</th>
-                  <th className="p-4 font-semibold text-sm">Requested By</th>
-                  <th className="p-4 font-semibold text-sm">Type</th>
-                  <th className="p-4 font-semibold text-sm">Status</th>
-                  <th className="p-4 font-semibold text-sm text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Desktop View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Request</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Requested By</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
+                      <th className="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {requests.map((req) => (
+                      <tr key={req.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-gray-900">{req.title}</div>
+                          <div className="text-[11px] text-gray-400 truncate max-w-xs">{req.description}</div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-700">{req.requestedBy}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1 text-[10px] font-black text-gray-500 uppercase">
+                            {req.type === 'LEAVE' ? <Calendar size={12} /> : req.type === 'EXPENSE' ? <DollarSign size={12} /> : <Briefcase size={12} />}
+                            {req.type}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-[10px] font-black uppercase rounded-full border ${
+                            req.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-100' :
+                            req.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-100' :
+                            'bg-amber-50 text-amber-700 border-amber-100'
+                          }`}>
+                            {req.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {req.status === 'PENDING' && role === 'MANAGER' && (
+                            <div className="flex justify-end gap-3">
+                              <button onClick={() => handleUpdateStatus(req.id, 'APPROVED')} className="text-green-600 text-[10px] font-black uppercase">Approve</button>
+                              <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className="text-red-600 text-[10px] font-black uppercase">Reject</button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="md:hidden divide-y divide-gray-100">
                 {requests.map((req) => (
-                  <tr key={req.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div className="font-bold">{req.title}</div>
-                      <div className="text-sm text-gray-600">{req.description}</div>
-                    </td>
-                    <td className="p-4 text-sm">{req.requestedBy}</td>
-                    <td className="p-4 text-sm">{req.type}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold ${
-                        req.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
-                        req.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
+                  <div key={req.id} className="p-4 active:bg-gray-50">
+                    <div className="flex justify-between items-start mb-1.5">
+                      <h4 className="font-bold text-gray-900 leading-tight pr-4">{req.title}</h4>
+                      <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded-full border flex-shrink-0 ${
+                        req.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-100' :
+                        req.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-100' :
+                        'bg-amber-50 text-amber-700 border-amber-100'
                       }`}>
                         {req.status}
                       </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      {req.status === 'PENDING' && role === 'MANAGER' ? (
-                        <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => handleUpdateStatus(req.id, 'APPROVED')}
-                            className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
-                          >
-                            Approve
-                          </button>
-                          <button 
-                            onClick={() => handleUpdateStatus(req.id, 'REJECTED')}
-                            className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400">Locked</span>
-                      )}
-                    </td>
-                  </tr>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3 line-clamp-2">{req.description}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase">
+                        By <span className="text-gray-700">{req.requestedBy}</span>
+                      </div>
+                      <div className="flex gap-4">
+                        {req.status === 'PENDING' && role === 'MANAGER' && (
+                          <div className="flex gap-3">
+                            <button onClick={() => handleUpdateStatus(req.id, 'APPROVED')} className="text-green-600 text-[10px] font-black uppercase">Pass</button>
+                            <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className="text-red-600 text-[10px] font-black uppercase">Fail</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
-      </div>
+      </main>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Create New Request</h2>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
+          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl shadow-2xl p-8">
+            <h3 className="text-lg font-bold mb-6">New Request</h3>
             <form onSubmit={handleCreateRequest} className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold mb-1">Title</label>
-                <input 
-                  type="text" required
-                  className="w-full border p-2 rounded"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">Requested By</label>
-                <input 
-                  type="text" required
-                  className="w-full border p-2 rounded"
-                  value={formData.requestedBy}
-                  onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">Type</label>
-                <select 
-                  className="w-full border p-2 rounded"
-                  value={formData.type}
-                  onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
-                >
-                  <option value="GENERAL">General</option>
-                  <option value="LEAVE">Leave</option>
-                  <option value="EXPENSE">Expense</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">Description</label>
-                <textarea 
-                  required
-                  className="w-full border p-2 rounded h-24"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                />
-              </div>
-              <div className="flex gap-2 pt-2">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 bg-gray-200 py-2 rounded font-semibold"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold"
-                >
-                  Submit
-                </button>
+              <input 
+                type="text" required placeholder="Subject" 
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
+              />
+              <input 
+                type="text" required placeholder="Your Name" 
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                value={formData.requestedBy} onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
+              />
+              <select 
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
+                value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
+              >
+                <option value="GENERAL">General</option>
+                <option value="LEAVE">Leave</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+              <textarea 
+                rows={3} required placeholder="Description" 
+                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 resize-none"
+                value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 py-3 rounded-lg text-sm font-bold text-gray-400">Cancel</button>
+                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-bold shadow-lg">Submit</button>
               </div>
             </form>
           </div>

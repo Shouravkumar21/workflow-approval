@@ -13,7 +13,6 @@ import {
   Calendar,
   DollarSign,
   Briefcase,
-  Trash2,
   Clock
 } from "lucide-react";
 
@@ -75,7 +74,7 @@ export default function Dashboard() {
       setFormData({ title: "", description: "", requestedBy: "", type: "GENERAL" });
       fetchRequests();
     } catch (error) {
-      alert("Error creating request.");
+      alert("Error creating request. Please try again.");
     }
   };
 
@@ -84,49 +83,40 @@ export default function Dashboard() {
       await axios.put(`${API_URL}/${id}/status`, { status, role });
       fetchRequests();
     } catch (error: any) {
-      alert(error.response?.data?.message || "Action failed.");
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this request?")) return;
-    try {
-      await axios.delete(`${API_URL}/${id}`);
-      fetchRequests();
-    } catch (error) {
-      alert("Delete failed.");
+      alert(error.response?.data?.message || "Operation failed.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20 sm:pb-0">
       {/* Header */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between sm:h-16 py-3 sm:py-0 gap-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-blue-600" size={24} />
-              <span className="text-lg font-bold">Request Workflow</span>
+              <span className="text-lg font-bold tracking-tight">Request Workflow</span>
             </div>
             
-            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
-              <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
+            <div className="flex items-center justify-between sm:justify-end gap-3">
+              <div className="flex bg-gray-100 rounded-lg p-1">
                 <button 
-                  className={`flex-1 sm:flex-none px-4 py-1 text-xs font-semibold rounded-md transition-all ${role === 'USER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
+                  className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${role === 'USER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
                   onClick={() => setRole('USER')}
                 >
-                  User
+                  User View
                 </button>
                 <button 
-                  className={`flex-1 sm:flex-none px-4 py-1 text-xs font-semibold rounded-md transition-all ${role === 'MANAGER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
+                  className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${role === 'MANAGER' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500'}`}
                   onClick={() => setRole('MANAGER')}
                 >
-                  Manager
+                  Manager View
                 </button>
               </div>
+              
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="hidden sm:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                className="hidden sm:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm"
               >
                 <Plus size={18} />
                 New Request
@@ -139,26 +129,26 @@ export default function Dashboard() {
       {/* FAB */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="sm:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg"
+        className="sm:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:bg-blue-700 transition-colors"
       >
         <Plus size={24} />
       </button>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
-        {/* Stats Grid - Fixed to 1 line row */}
+        {/* Stats Grid */}
         <div className="flex flex-row gap-2 sm:gap-6 mb-6">
           <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
             <div className="p-1.5 sm:p-3 bg-blue-50 rounded-lg text-blue-600 mb-1 sm:mb-2">
               <Plus size={16} />
             </div>
-            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase mb-0.5">Total</p>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Total</p>
             <p className="text-sm sm:text-2xl font-black">{requests.length}</p>
           </div>
           <div className="flex-1 bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center aspect-square sm:aspect-auto sm:p-6">
             <div className="p-1.5 sm:p-3 bg-amber-50 rounded-lg text-amber-600 mb-1 sm:mb-2">
               <Clock size={16} />
             </div>
-            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase mb-0.5">Wait</p>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Pending</p>
             <p className="text-sm sm:text-2xl font-black text-amber-600">
               {requests.filter(r => r.status === 'PENDING').length}
             </p>
@@ -167,7 +157,7 @@ export default function Dashboard() {
             <div className="p-1.5 sm:p-3 bg-green-50 rounded-lg text-green-600 mb-1 sm:mb-2">
               <CheckCircle2 size={16} />
             </div>
-            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase mb-0.5">Pass</p>
+            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Approved</p>
             <p className="text-sm sm:text-2xl font-black text-green-600">
               {requests.filter(r => r.status === 'APPROVED').length}
             </p>
@@ -175,27 +165,27 @@ export default function Dashboard() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex items-center gap-2 text-gray-400">
               <Filter size={16} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Filters</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Filter By</span>
             </div>
             <div className="grid grid-cols-2 gap-2 w-full">
               <select 
                 value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               >
-                <option value="">Status: All</option>
+                <option value="">All Statuses</option>
                 <option value="PENDING">Pending</option>
                 <option value="APPROVED">Approved</option>
                 <option value="REJECTED">Rejected</option>
               </select>
               <select 
                 value={filterType} onChange={(e) => setFilterType(e.target.value)}
-                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none"
+                className="px-3 py-2 text-xs font-bold border border-gray-100 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               >
-                <option value="">Type: All</option>
+                <option value="">All Types</option>
                 <option value="LEAVE">Leave</option>
                 <option value="EXPENSE">Expense</option>
                 <option value="GENERAL">General</option>
@@ -204,25 +194,25 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* List */}
+        {/* List Content */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="py-20 flex flex-col items-center justify-center text-gray-400">
               <Loader2 className="animate-spin mb-2" size={32} />
-              <p className="text-[10px] font-black uppercase">Loading</p>
+              <p className="text-[10px] font-black uppercase tracking-widest">Syncing...</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="py-20 text-center text-gray-300 px-4">
+            <div className="py-24 text-center text-gray-300 px-4">
               <ShieldCheck size={48} className="mx-auto mb-2 opacity-10" />
-              <p className="text-xs font-bold uppercase tracking-widest">Empty Workspace</p>
+              <p className="text-xs font-bold uppercase tracking-widest">No Requests Found</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
               {requests.map((req) => (
-                <div key={req.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-1.5">
+                <div key={req.id} className="p-5 sm:p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
                     <h4 className="font-bold text-gray-900 leading-tight pr-4">{req.title}</h4>
-                    <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded-full border flex-shrink-0 ${
+                    <span className={`px-2.5 py-1 text-[9px] font-black uppercase rounded-full border shadow-sm flex-shrink-0 ${
                       req.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-100' :
                       req.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-100' :
                       'bg-amber-50 text-amber-700 border-amber-100'
@@ -230,20 +220,38 @@ export default function Dashboard() {
                       {req.status}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3 line-clamp-1">{req.description}</p>
+                  <p className="text-xs text-gray-500 mb-4 line-clamp-2">{req.description}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-[9px] font-black">{req.requestedBy.charAt(0).toUpperCase()}</div>
-                      <span className="text-[10px] font-bold text-gray-500 uppercase">{req.requestedBy}</span>
+                      <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-[9px] font-black shadow-sm">
+                        {req.requestedBy.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                        Requested by <span className="text-gray-700">{req.requestedBy}</span>
+                      </span>
                     </div>
-                    <div className="flex gap-4">
+                    
+                    <div className="flex items-center gap-4">
                       {req.status === 'PENDING' && role === 'MANAGER' ? (
-                        <div className="flex gap-3">
-                          <button onClick={() => handleUpdateStatus(req.id, 'APPROVED')} className="text-green-600 text-[10px] font-black uppercase">Pass</button>
-                          <button onClick={() => handleUpdateStatus(req.id, 'REJECTED')} className="text-red-600 text-[10px] font-black uppercase">Fail</button>
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => handleUpdateStatus(req.id, 'APPROVED')} 
+                            className="text-green-600 text-[10px] font-black uppercase hover:text-green-700 tracking-widest transition-colors"
+                          >
+                            Approve
+                          </button>
+                          <button 
+                            onClick={() => handleUpdateStatus(req.id, 'REJECTED')} 
+                            className="text-red-600 text-[10px] font-black uppercase hover:text-red-700 tracking-widest transition-colors"
+                          >
+                            Reject
+                          </button>
                         </div>
                       ) : (
-                        <button onClick={() => handleDelete(req.id)} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+                          <CheckCircle2 size={12} />
+                          {req.status === 'PENDING' ? 'Processing' : 'Finalized'}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -257,36 +265,48 @@ export default function Dashboard() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
-          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-6 sm:p-8">
-            <h3 className="text-lg font-bold mb-6">Create Request</h3>
+          <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)} />
+          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl shadow-2xl p-8 transform transition-all">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Create New Request</h3>
             <form onSubmit={handleCreateRequest} className="space-y-4">
-              <input 
-                type="text" required placeholder="Subject" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
-                value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
-              />
-              <input 
-                type="text" required placeholder="Your Name" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
-                value={formData.requestedBy} onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
-              />
-              <select 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50"
-                value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
-              >
-                <option value="GENERAL">General</option>
-                <option value="LEAVE">Leave</option>
-                <option value="EXPENSE">Expense</option>
-              </select>
-              <textarea 
-                rows={3} required placeholder="Reason" 
-                className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 resize-none"
-                value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
-              />
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 py-3 rounded-lg text-sm font-bold text-gray-400">Cancel</button>
-                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-bold shadow-lg">Submit</button>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Title</label>
+                <input 
+                  type="text" required placeholder="Enter title" 
+                  className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Requested By</label>
+                <input 
+                  type="text" required placeholder="Enter your name" 
+                  className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  value={formData.requestedBy} onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
+                <select 
+                  className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
+                >
+                  <option value="GENERAL">General</option>
+                  <option value="LEAVE">Leave</option>
+                  <option value="EXPENSE">Expense</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                <textarea 
+                  rows={3} required placeholder="Briefly describe the request" 
+                  className="w-full border border-gray-100 rounded-lg px-4 py-3 text-sm font-bold bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                  value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 py-3 rounded-lg text-sm font-bold text-gray-400 hover:bg-gray-200 transition-colors">Cancel</button>
+                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-sm font-bold shadow-lg hover:bg-blue-700 transition-all">Submit Request</button>
               </div>
             </form>
           </div>

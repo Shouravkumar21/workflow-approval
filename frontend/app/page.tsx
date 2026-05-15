@@ -130,7 +130,7 @@ export default function Dashboard() {
             <select 
               value={filterStatus} 
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
               <option value="PENDING">Pending</option>
@@ -141,7 +141,7 @@ export default function Dashboard() {
             <select 
               value={filterType} 
               onChange={(e) => setFilterType(e.target.value)}
-              className="rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Types</option>
               <option value="LEAVE">Leave</option>
@@ -256,7 +256,7 @@ export default function Dashboard() {
                 <input 
                   type="text" 
                   required 
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="e.g., Summer Vacation"
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -268,7 +268,7 @@ export default function Dashboard() {
                 <input 
                   type="text" 
                   required 
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Your full name"
                   value={formData.requestedBy}
                   onChange={(e) => setFormData({...formData, requestedBy: e.target.value})}
@@ -278,7 +278,7 @@ export default function Dashboard() {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Type</label>
                 <select 
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   value={formData.type}
                   onChange={(e) => setFormData({...formData, type: e.target.value as RequestType})}
                 >
@@ -293,7 +293,7 @@ export default function Dashboard() {
                 <textarea 
                   rows={3} 
                   required 
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                   placeholder="Briefly explain your request..."
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
